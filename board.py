@@ -2,6 +2,9 @@ import pygame
 from utils import load_img
 from constants import *
 
+black_start = [1, 3, 5, 7, 8, 10, 12, 14, 17, 19, 21, 23]
+red_start = [40, 42, 44, 46, 49, 51, 53, 55, 56, 58, 60, 62]
+
 
 class Piece:
     def __init__(self, images, color, index):
@@ -32,6 +35,10 @@ class Board:
         self.images = images
 
         self.board: list[None | Piece] = [None for _ in range(64)]
-        self.board[0] = Piece(self.images, "red", 0)
-        self.board[5] = Piece(self.images, "black", 5)
-        self.board[50] = Piece(self.images, "red", 50)
+        self.arrange_board()
+
+    def arrange_board(self):
+        for index in black_start:
+            self.board[index] = Piece(self.images, "black", index)
+        for index in red_start:
+            self.board[index] = Piece(self.images, "red", index)

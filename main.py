@@ -1,3 +1,4 @@
+from re import DEBUG
 import sys
 import pygame
 from utils import *
@@ -21,6 +22,9 @@ images = {
     ],
 }
 
+debug_font = pygame.font.SysFont("fira code", 20)
+DEBUG = False
+
 
 def draw_board():
     for file in range(8):
@@ -34,6 +38,17 @@ def draw_board():
                 color,
                 pygame.Rect(position["x"], position["y"], width / 8, height / 8),
             )
+
+            position = {
+                "x": (width / 8) * file + cell_width / 2,
+                "y": (height / 8) * rank + cell_height / 2,
+            }
+
+            # For Debugging
+            if DEBUG:
+                text = debug_font.render(str(8 * rank + file), False, (0, 0, 0))
+                rect = text.get_rect(center=(position["x"], position["y"]))
+                DISPLAY.blit(text, rect.topleft)
 
 
 game = Board(images)
