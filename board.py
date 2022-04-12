@@ -21,13 +21,25 @@ class Piece:
         else:
             self.direction = "-"
 
-    def show(self, surface):
-        file, rank = self.index % 8, self.index // 8
-        position = (
-            (width / 8) * file + (cell_width / 2) - (self.image.get_width() * 0.58),
-            (height / 8) * rank + (cell_height / 2) - (self.image.get_height() * 0.50),
-        )
-        surface.blit(self.image, position)
+    def reset_index(self, index):
+        self.index = index
+
+    def show(self, surface, pos=None):
+        if pos is None:
+            file, rank = self.index % 8, self.index // 8
+            position = (
+                (width / 8) * file + (cell_width / 2) - (self.image.get_width() * 0.58),
+                (height / 8) * rank
+                + (cell_height / 2)
+                - (self.image.get_height() * 0.50),
+            )
+            surface.blit(self.image, position)
+        else:
+            position = (
+                pos[0] - (self.image.get_width() * 0.58),
+                pos[1] - (self.image.get_height() * 0.50),
+            )
+            surface.blit(self.image, position)
 
 
 class Board:
@@ -35,6 +47,8 @@ class Board:
         self.images = images
 
         self.board: list[None | Piece] = [None for _ in range(64)]
+        self.active_piece: None | Piece = None
+
         self.arrange_board()
 
     def arrange_board(self):

@@ -1,4 +1,3 @@
-from re import DEBUG
 import sys
 import pygame
 from utils import *
@@ -61,12 +60,30 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            file, rank = mx // cell_width, my // cell_height
+            index = int(file + rank * 8)
+
+            game.active_piece = game.board[index]
+            game.board[index] = None
+
+        if event.type == pygame.MOUSEBUTTONUP:
+            if game.active_piece is not None:
+                file, rank = mx // cell_width, my // cell_height
+                index = int(file + rank * 8)
+
+                game.active_piece.reset_index(index)
+                game.board[index] = game.active_piece
+                game.active_piece = None
 
     draw_board()
 
     for piece in game.board:
         if piece is not None:
             piece.show(DISPLAY)
+
+    if game.active_piece is not None:
+        game.active_piece.show(DISPLAY, (mx, my))
 
     pygame.display.update()
     clock.tick()
