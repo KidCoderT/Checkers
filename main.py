@@ -1,13 +1,25 @@
 import sys
 import pygame
 from utils import *
+from constants import *
 
 pygame.init()
 
-width, height = 720, 720
+from board import Board
+
 DISPLAY = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Checkers")
-clock = pygame.time.Clock()
+
+images = {
+    "red": [
+        load_img("assets/red-checker/standard.png"),
+        load_img("assets/red-checker/king.png"),
+    ],
+    "black": [
+        load_img("assets/black-checker/standard.png"),
+        load_img("assets/black-checker/king.png"),
+    ],
+}
 
 
 def draw_board():
@@ -24,6 +36,8 @@ def draw_board():
             )
 
 
+game = Board(images)
+
 while True:
     DISPLAY.fill((0, 0, 0))
     mx, my = pygame.mouse.get_pos()
@@ -34,6 +48,10 @@ while True:
             sys.exit()
 
     draw_board()
+
+    for piece in game.board:
+        if piece is not None:
+            piece.show(DISPLAY)
 
     pygame.display.update()
     clock.tick()
