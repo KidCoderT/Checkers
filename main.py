@@ -22,14 +22,14 @@ images = {
 }
 
 debug_font = pygame.font.SysFont("fira code", 20)
-DEBUG = False
+DEBUG = True
 
 
 def draw_board():
     for file in range(8):
         for rank in range(8):
             isLightSquare = (file + rank) % 2 == 0
-            color = (244, 250, 255) if isLightSquare else (160, 179, 195)
+            color = (232, 237, 249) if isLightSquare else (183, 192, 216)
             position = {"x": (width / 8) * file, "y": (height / 8) * rank}
 
             pygame.draw.rect(
@@ -64,17 +64,30 @@ while True:
             file, rank = mx // cell_width, my // cell_height
             index = int(file + rank * 8)
 
-            game.active_piece = game.board[index]
-            game.board[index] = None
+            if game.board[index] is not None:
+                game.active_piece = game.board[index]
+                game.active_piece.find_possible_moves(game.board)
+
+                game.board[index] = None
 
         if event.type == pygame.MOUSEBUTTONUP:
             if game.active_piece is not None:
                 file, rank = mx // cell_width, my // cell_height
                 index = int(file + rank * 8)
 
-                game.active_piece.reset_index(index)
-                game.board[index] = game.active_piece
-                game.active_piece = None
+                for move in game.active_piece.possible_moves:
+                    if move.index == index:
+                        if move.to_kill is not None:
+                            game.board[move.to_kill] = None
+                        game.active_piece.reset_index(index)
+                        if move.is_promotion:
+                            game.active_piece.promote()
+                        game.board[index] = game.active_piece
+                        game.active_piece = None
+                        break
+                else:
+                    game.board[game.active_piece.index] = game.active_piece
+                    game.active_piece = None
 
     draw_board()
 
@@ -83,6 +96,18 @@ while True:
             piece.show(DISPLAY)
 
     if game.active_piece is not None:
+        for move in game.active_piece.possible_moves:
+            index = move.index
+            file, rank = index % 8, index // 8
+
+            position = {
+                "x": (width / 8) * file + cell_width / 2,
+                "y": (height / 8) * rank + cell_height / 2,
+            }
+            pygame.draw.circle(
+                DISPLAY, (103, 95, 186), (position["x"], position["y"]), 12
+            )
+
         game.active_piece.show(DISPLAY, (mx, my))
 
     pygame.display.update()
